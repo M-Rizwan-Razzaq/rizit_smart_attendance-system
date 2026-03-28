@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header mb-4">
+    <div>
+        <div class="eyebrow">Class attendance</div>
+        <h1 class="fw-bold mb-2">{{ class_row.class_name }}</h1>
+        <p class="text-secondary mb-0">Review recent QR sessions and student attendance for this class.</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="{{ url_for('teacher_dashboard') }}">Back to dashboard</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">Attendance Records</h2>
+                {% if records %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in records %}
+                                    <tr>
+                                        <td>{{ row.student_name }}</td>
+                                        <td>{{ row.date }}</td>
+                                        <td><span class="badge text-bg-success">{{ row.status }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No attendance records found for this class.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">QR Sessions</h2>
+                {% if sessions %}
+                    <div class="stack-gap">
+                        {% for session_item in sessions %}
+                            <div class="session-item">
+                                <code class="d-block mb-2">{{ session_item.qr_code }}</code>
+                                <div class="small text-secondary">Created at {{ session_item.created_at }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No QR sessions created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

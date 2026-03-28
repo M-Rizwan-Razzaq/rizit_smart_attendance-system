@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header mb-4">
+    <div>
+        <div class="eyebrow">Teacher dashboard</div>
+        <h1 class="fw-bold mb-2">Manage classes and QR sessions</h1>
+        <p class="text-secondary mb-0">Create a class, generate a QR code, and let students record attendance instantly.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">Create Class</h2>
+                <form method="post" class="d-grid gap-3">
+                    <div>
+                        <label class="form-label">Class name</label>
+                        <input type="text" name="class_name" class="form-control" placeholder="e.g. Database Systems" required>
+                    </div>
+                    <button class="btn btn-dark" type="submit">Add Class</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 fw-bold mb-0">Your Classes</h2>
+                    <span class="badge text-bg-light">{{ classes|length }} total</span>
+                </div>
+
+                {% if classes %}
+                    <div class="row g-3">
+                        {% for class_item in classes %}
+                            <div class="col-12">
+                                <div class="class-card">
+                                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                                        <div>
+                                            <div class="fw-semibold">{{ class_item.class_name }}</div>
+                                            <div class="small text-secondary">Class ID: {{ class_item.id }}</div>
+                                            <div class="small text-secondary">QR sessions created: {{ class_item.qr_count }}</div>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <form method="post" action="{{ url_for('generate_qr', class_id=class_item.id) }}">
+                                                <button class="btn btn-primary btn-sm" type="submit">Generate QR</button>
+                                            </form>
+                                            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('class_attendance', class_id=class_item.id) }}">View Attendance</a>
+                                        </div>
+                                    </div>
+
+                                    {% if qr_previews.get(class_item.id) %}
+                                        <div class="qr-preview mt-3">
+                                            <img src="{{ qr_previews.get(class_item.id) }}" alt="QR code" class="img-fluid rounded-3 border bg-white p-2">
+                                            <div class="small text-secondary mt-2">
+                                                Latest session created at {{ class_item.latest_created_at }}
+                                            </div>
+                                            <div class="token-box mt-2">
+                                                <span class="label">QR payload:</span>
+                                                <code>{{ class_item.latest_qr }}</code>
+                                            </div>
+                                            <div class="small text-secondary mt-2">
+                                                Encodes `class_id` and `session_id` for scanning.
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="small text-secondary mt-3">No QR session created yet for this class.</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No classes yet. Create your first one using the form on the left.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 fw-bold mb-0">Recent Attendance</h2>
+                    <span class="badge text-bg-light">{{ attendance_rows|length }} records</span>
+                </div>
+
+                {% if attendance_rows %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Class</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in attendance_rows %}
+                                    <tr>
+                                        <td>{{ row.student_name }}</td>
+                                        <td>{{ row.class_name }}</td>
+                                        <td>{{ row.date }}</td>
+                                        <td><span class="badge text-bg-success">{{ row.status }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No attendance has been recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header mb-4">
+    <div>
+        <div class="eyebrow">Student dashboard</div>
+        <h1 class="fw-bold mb-2">Your attendance overview</h1>
+        <p class="text-secondary mb-0">Review your attendance history and jump to the QR scanner when you’re ready to mark attendance.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('student_scan') }}">Open QR Scanner</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">Available Classes</h2>
+                {% if classes %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for class_item in classes %}
+                            <span class="badge rounded-pill text-bg-light border">{{ class_item.class_name }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No classes available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">Your Attendance History</h2>
+                {% if records %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in records %}
+                                    <tr>
+                                        <td>{{ row.class_name }}</td>
+                                        <td>{{ row.date }}</td>
+                                        <td><span class="badge text-bg-success">{{ row.status }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No attendance records yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
