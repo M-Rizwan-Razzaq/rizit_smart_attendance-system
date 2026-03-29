@@ -1,4 +1,4 @@
-# Smart Student Attendance System
+# Rizt Smart Attandence
 
 A Flask + SQLite project for QR-based student attendance tracking.
 

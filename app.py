@@ -4,7 +4,7 @@ import json
 import os
 import sqlite3
 import uuid
-from datetime import date
+from datetime import date, datetime
 from functools import wraps
 
 import qrcode
@@ -30,7 +30,11 @@ def create_app():
 
     @app.context_processor
     def inject_user():
-        return {"current_user": session.get("user_name"), "current_role": session.get("user_role")}
+        return {
+            "current_user": session.get("user_name"),
+            "current_role": session.get("user_role"),
+            "current_year": datetime.now().year,
+        }
 
     def login_required(view):
         @wraps(view)
@@ -64,13 +68,119 @@ def create_app():
         encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
         return f"data:image/png;base64,{encoded}"
 
+    def render_info_page(key):
+        pages = {
+            "terms": {
+                "title": "Terms and Conditions",
+                "eyebrow": "Legal",
+                "headline": "Terms and Conditions",
+                "description": "These terms explain how the attendance system should be used by teachers and students.",
+                "sections": [
+                    {
+                        "title": "Account usage",
+                        "body": "Use a valid email address and keep your password private. You are responsible for activity on your account.",
+                    },
+                    {
+                        "title": "Attendance records",
+                        "body": "Attendance is recorded based on QR sessions created by the teacher and scanned by the student.",
+                    },
+                    {
+                        "title": "Acceptable use",
+                        "body": "Do not attempt to bypass QR validation, impersonate another user, or misuse the application.",
+                    },
+                ],
+            },
+            "privacy": {
+                "title": "Privacy Policy",
+                "eyebrow": "Legal",
+                "headline": "Privacy Policy",
+                "description": "A short overview of what the system stores and how it uses that data.",
+                "sections": [
+                    {
+                        "title": "Data stored",
+                        "body": "The app stores name, email, role, class records, QR session data, and attendance marks in SQLite.",
+                    },
+                    {
+                        "title": "Data purpose",
+                        "body": "Data is only used to authenticate users, generate QR sessions, and show attendance history.",
+                    },
+                    {
+                        "title": "Local deployment",
+                        "body": "This project is designed for local or private deployment. No external analytics or tracking is included.",
+                    },
+                ],
+            },
+            "faqs": {
+                "title": "FAQs",
+                "eyebrow": "Support",
+                "headline": "Frequently Asked Questions",
+                "description": "Quick answers to the most common questions about the system.",
+                "sections": [
+                    {
+                        "title": "How does attendance work?",
+                        "body": "The teacher creates a QR session, the student scans it, and attendance is saved for that day.",
+                    },
+                    {
+                        "title": "Can both teachers and students sign up?",
+                        "body": "Yes. The signup page lets you choose either teacher or student during registration.",
+                    },
+                    {
+                        "title": "Where do I see records?",
+                        "body": "Teachers can review class attendance on the dashboard, and students can view their own history.",
+                    },
+                ],
+            },
+            "docs": {
+                "title": "Documentation",
+                "eyebrow": "Guide",
+                "headline": "Documentation",
+                "description": "A simple step-by-step guide for using Rizt Smart Attandence.",
+                "sections": [
+                    {
+                        "title": "1. Create an account",
+                        "body": "Open the signup page, choose teacher or student, and register with your email.",
+                    },
+                    {
+                        "title": "2. Teacher flow",
+                        "body": "Log in as a teacher, create a class, generate a QR session, and show the QR code to students.",
+                    },
+                    {
+                        "title": "3. Student flow",
+                        "body": "Log in as a student, open the QR scanner page, scan the code, and confirm the success message.",
+                    },
+                ],
+            },
+        }
+
+        page = pages.get(key)
+        if not page:
+            return redirect(url_for("index"))
+
+        return render_template("info_page.html", page=page, title=page["title"])
+
     @app.route("/")
     def index():
         if "user_id" in session:
             if session.get("user_role") == "teacher":
                 return redirect(url_for("teacher_dashboard"))
             return redirect(url_for("student_scan"))
-        return redirect(url_for("login"))
+        return render_template("landing.html")
+
+    @app.route("/terms")
+    def terms():
+        return render_info_page("terms")
+
+    @app.route("/privacy")
+    def privacy():
+        return render_info_page("privacy")
+
+    @app.route("/faqs")
+    def faqs():
+        return render_info_page("faqs")
+
+    @app.route("/docs")
+    def docs():
+        return render_info_page("docs")
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
@@ -332,6 +442,14 @@ def create_app():
     @role_required("student")
     def student_dashboard():
         db = get_db()
+        classes = db.execute(
+            """
+            SELECT id, class_name
+            FROM classes
+            ORDER BY class_name ASC
+            """
+        ).fetchall()
+
         records = db.execute(
             """
             SELECT a.date, a.status, c.class_name

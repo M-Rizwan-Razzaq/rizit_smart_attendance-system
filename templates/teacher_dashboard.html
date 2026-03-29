@@ -1,49 +1,65 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="page-header mb-4">
+<div class="page-header teacher-head mb-4">
     <div>
         <div class="eyebrow">Teacher dashboard</div>
-        <h1 class="fw-bold mb-2">Manage classes and QR sessions</h1>
-        <p class="text-secondary mb-0">Create a class, generate a QR code, and let students record attendance instantly.</p>
+        <h1 class="fw-bold mb-2">Manage classes and live QR sessions</h1>
+        <p class="text-white-50 mb-0">Create class spaces, generate attendance QR, and monitor student check-ins from one place.</p>
+    </div>
+    <div class="teacher-head-stats">
+        <div class="teacher-pill">
+            <span class="teacher-pill-label">Classes</span>
+            <span class="teacher-pill-value">{{ classes|length }}</span>
+        </div>
+        <div class="teacher-pill">
+            <span class="teacher-pill-label">Recent records</span>
+            <span class="teacher-pill-value">{{ attendance_rows|length }}</span>
+        </div>
     </div>
 </div>
 
-<div class="row g-4">
-    <div class="col-12 col-lg-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <h2 class="h5 fw-bold mb-3">Create Class</h2>
+<div class="row g-4 align-items-start teacher-grid">
+    <div class="col-12 col-xl-4">
+        <div class="card border-0 shadow-sm teacher-create-card">
+            <div class="card-body p-4 p-lg-4">
+                <div class="create-head mb-3">
+                    <div class="create-badge">Quick Action</div>
+                    <h2 class="h4 fw-bold mb-1">Create Class</h2>
+                    <p class="text-secondary mb-0 small">Start a new class and instantly enable QR attendance sessions.</p>
+                </div>
                 <form method="post" class="d-grid gap-3">
                     <div>
-                        <label class="form-label">Class name</label>
-                        <input type="text" name="class_name" class="form-control" placeholder="e.g. Database Systems" required>
+                        <label class="form-label">Class Name</label>
+                        <input type="text" name="class_name" class="form-control form-control-lg" placeholder="e.g. Database Systems" required>
                     </div>
-                    <button class="btn btn-dark" type="submit">Add Class</button>
+                    <button class="btn btn-primary btn-lg" type="submit">Add Class</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="col-12 col-lg-8">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="col-12 col-xl-8">
+        <div class="card border-0 shadow-sm teacher-classes-card">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                     <h2 class="h5 fw-bold mb-0">Your Classes</h2>
-                    <span class="badge text-bg-light">{{ classes|length }} total</span>
+                    <span class="teacher-count-badge">{{ classes|length }} total</span>
                 </div>
 
                 {% if classes %}
                     <div class="row g-3">
                         {% for class_item in classes %}
                             <div class="col-12">
-                                <div class="class-card">
-                                    <div class="d-flex justify-content-between flex-wrap gap-2">
-                                        <div>
-                                            <div class="fw-semibold">{{ class_item.class_name }}</div>
-                                            <div class="small text-secondary">Class ID: {{ class_item.id }}</div>
-                                            <div class="small text-secondary">QR sessions created: {{ class_item.qr_count }}</div>
+                                <div class="class-card teacher-class-card">
+                                    <div class="d-flex justify-content-between flex-wrap gap-3 align-items-start">
+                                        <div class="class-meta">
+                                            <div class="fw-semibold class-name">{{ class_item.class_name }}</div>
+                                            <div class="class-meta-row">
+                                                <span class="class-chip">Class ID: {{ class_item.id }}</span>
+                                                <span class="class-chip">QR sessions: {{ class_item.qr_count }}</span>
+                                            </div>
                                         </div>
-                                        <div class="d-flex gap-2">
+                                        <div class="d-flex gap-2 flex-wrap class-actions">
                                             <form method="post" action="{{ url_for('generate_qr', class_id=class_item.id) }}">
                                                 <button class="btn btn-primary btn-sm" type="submit">Generate QR</button>
                                             </form>
@@ -52,21 +68,25 @@
                                     </div>
 
                                     {% if qr_previews.get(class_item.id) %}
-                                        <div class="qr-preview mt-3">
-                                            <img src="{{ qr_previews.get(class_item.id) }}" alt="QR code" class="img-fluid rounded-3 border bg-white p-2">
-                                            <div class="small text-secondary mt-2">
-                                                Latest session created at {{ class_item.latest_created_at }}
+                                        <div class="qr-preview teacher-qr-panel mt-3">
+                                            <div class="qr-image-wrap">
+                                                <img src="{{ qr_previews.get(class_item.id) }}" alt="QR code" class="img-fluid rounded-3 border bg-white p-2 teacher-qr-image">
                                             </div>
-                                            <div class="token-box mt-2">
-                                                <span class="label">QR payload:</span>
-                                                <code>{{ class_item.latest_qr }}</code>
-                                            </div>
-                                            <div class="small text-secondary mt-2">
-                                                Encodes `class_id` and `session_id` for scanning.
+                                            <div class="qr-detail-wrap">
+                                                <div class="small text-secondary mb-2">
+                                                    Latest session created at <strong>{{ class_item.latest_created_at }}</strong>
+                                                </div>
+                                                <div class="token-box mt-2">
+                                                    <span class="label">QR Payload:</span>
+                                                    <code>{{ class_item.latest_qr }}</code>
+                                                </div>
+                                                <div class="small text-secondary mt-2">
+                                                    Contains `class_id` and `session_id` for student scanning.
+                                                </div>
                                             </div>
                                         </div>
                                     {% else %}
-                                        <div class="small text-secondary mt-3">No QR session created yet for this class.</div>
+                                        <div class="small text-secondary mt-3 empty-msg">No QR session generated yet for this class.</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -81,15 +101,15 @@
 
     <div class="col-12">
         <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <h2 class="h5 fw-bold mb-0">Recent Attendance</h2>
-                    <span class="badge text-bg-light">{{ attendance_rows|length }} records</span>
+                    <span class="teacher-count-badge">{{ attendance_rows|length }} records</span>
                 </div>
 
                 {% if attendance_rows %}
-                    <div class="table-responsive">
-                        <table class="table align-middle">
+                    <div class="table-responsive teacher-table-wrap">
+                        <table class="table align-middle teacher-table">
                             <thead>
                                 <tr>
                                     <th>Student</th>

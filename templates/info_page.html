@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="info-page">
+    <div class="info-hero mb-4">
+        <div class="eyebrow mb-3">{{ page.eyebrow }}</div>
+        <h1 class="display-6 fw-bold text-white mb-3">{{ page.headline }}</h1>
+        <p class="text-white-50 mb-0">{{ page.description }}</p>
+    </div>
+
+    <div class="row g-4">
+        {% for section in page.sections %}
+            <div class="col-12 col-md-4">
+                <div class="info-card">
+                    <h2 class="h5 fw-bold">{{ section.title }}</h2>
+                    <p class="mb-0 text-secondary">{{ section.body }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

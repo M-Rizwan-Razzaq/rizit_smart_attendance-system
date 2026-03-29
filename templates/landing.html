@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing-hero">
+    <div class="row g-4 align-items-center">
+        <div class="col-12 col-lg-6">
+            <div class="eyebrow mb-3">Educational QR attendance workflow</div>
+            <h1 class="display-4 fw-bold text-white mb-3">Rizt Smart Attandence for teachers and students.</h1>
+            <p class="lead text-white-50 mb-4">
+                A simple, modern attendance platform where teachers create QR sessions and students scan them to mark presence in seconds.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a class="btn btn-primary btn-lg" href="{{ url_for('signup') }}">Get Started</a>
+                <a class="btn btn-outline-light btn-lg" href="{{ url_for('login') }}">Login</a>
+            </div>
+
+            <div class="landing-points mt-4">
+                <div class="landing-point">
+                    <span class="landing-icon">01</span>
+                    Teacher and student roles with separate dashboards
+                </div>
+                <div class="landing-point">
+                    <span class="landing-icon">02</span>
+                    QR-generated sessions stored in SQLite
+                </div>
+                <div class="landing-point">
+                    <span class="landing-icon">03</span>
+                    Fast camera scanning with instant success feedback
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="landing-preview">
+                <div class="preview-top">
+                    <img src="{{ url_for('static', filename='assets/rizt-brand.jpg') }}" alt="Rizt logo" class="preview-logo">
+                    <div>
+                        <div class="preview-title">Rizt Smart Attandence</div>
+                        <div class="preview-subtitle">QR attendance made organized</div>
+                    </div>
+                </div>
+
+                <div class="preview-grid">
+                    <div class="preview-card">
+                        <div class="preview-card-label">Teacher</div>
+                        <div class="preview-card-value">Create class + QR session</div>
+                    </div>
+                    <div class="preview-card">
+                        <div class="preview-card-label">Student</div>
+                        <div class="preview-card-value">Scan QR and mark attendance</div>
+                    </div>
+                    <div class="preview-card">
+                        <div class="preview-card-label">Database</div>
+                        <div class="preview-card-value">SQLite records attendance</div>
+                    </div>
+                    <div class="preview-card">
+                        <div class="preview-card-label">Support</div>
+                        <div class="preview-card-value">Docs, FAQs and policies included</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="mt-5 pt-3">
+    <div class="section-heading mb-4">
+        <div class="eyebrow mb-2">Why this app</div>
+        <h2 class="text-white fw-bold mb-0">Built for a clean education workflow</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-12 col-md-4">
+            <div class="feature-card">
+                <h3>Simple Roles</h3>
+                <p>Teachers and students each get a separate experience, so the app stays easy to understand.</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="feature-card">
+                <h3>Fast QR Attendance</h3>
+                <p>Generate a session, scan the QR code, and save attendance without manual entry.</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="feature-card">
+                <h3>Helpful Pages</h3>
+                <p>Documentation, FAQs, terms, and privacy links are available from the footer on every page.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-5 pt-3">
+    <div class="section-heading mb-4">
+        <div class="eyebrow mb-2">How it works</div>
+        <h2 class="text-white fw-bold mb-0">Three quick steps</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-12 col-lg-4">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Sign up</h3>
+                <p>Create a teacher or student account in a few seconds.</p>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Generate QR</h3>
+                <p>Teacher creates a class and generates a QR session from the dashboard.</p>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Scan & Save</h3>
+                <p>Students scan the QR code and the backend saves attendance in SQLite.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
